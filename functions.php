@@ -18,6 +18,33 @@ function get_user_by_email($email) {
 };
 
 /**
+Parameters:
+string - $email
+string - $password
+
+Description: авторизовать пользователя
+
+Return value: boolean
+ **/
+function login($email, $password) {
+
+    $user = get_user_by_email($email);
+
+    if (empty($user)) {
+        set_flash_message("danger", "Пользователь не найден!");
+        redirect_to("/page_login.php");
+    }elseif (!password_verify($password, $user['password'])) {
+        set_flash_message("danger", "Ошибка при вводе пароля");
+        redirect_to("/page_login.php");
+    }else {
+        $_SESSION['id'] = $user['id'];
+        $_SESSION['email'] = $user['email'];
+        $_SESSION['password'] = $user['password'];
+        redirect_to("/users.php");
+    }
+}
+
+/**
     Parameters:
         string - $email
         stirng - $password
@@ -30,8 +57,7 @@ function add_user($email, $password) {
     $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
     $sql = "INSERT INTO two_person (email, password) VALUES (:email, :password)";
     $statement = $pdo->prepare($sql);
-    $result = $statement->execute([
-                                   "email" => $email,
+    $result = $statement->execute(["email" => $email,
                                    "password" => password_hash($password, PASSWORD_DEFAULT)
     ]);
 
@@ -49,6 +75,7 @@ function add_user($email, $password) {
 **/
 function set_flash_message($name, $message) {
     $_SESSION[$name] = $message;
+    $_SESSION['text_name'] = $name;
 };
 
 /**
@@ -63,6 +90,7 @@ function display_flash_message($name) {
     if (!empty($_SESSION[$name])) {
         echo "<div class=\"alert alert-{$name} text-dark\" role=\"alert\">{$_SESSION[$name]}</div>";
         unset($_SESSION[$name]);
+        unset($_SESSION['text_name']);
     }
 };
 
@@ -78,4 +106,5 @@ function redirect_to($path) {
     header('Location: ' . $path);
     exit();
 }
+
 ?>
