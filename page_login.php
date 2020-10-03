@@ -37,8 +37,8 @@ require "functions.php";
             </a>
         </div>
         <div class="card p-4 border-top-left-radius-0 border-top-right-radius-0">
-                <?php display_flash_message($_SESSION['text_name']);?>
-            <form action="authorization.php" method="POST">
+                <?php display_flash_message($_SESSION['status_message']);?>
+            <form action="auth.php" method="POST">
                 <div class="form-group">
                     <label class="form-label" for="username">Email</label>
                     <input type="email" id="username" class="form-control" placeholder="Эл. адрес" value="" name="user_email">

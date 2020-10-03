@@ -3,16 +3,24 @@
     Parameters:
         string - $email
 
-    Description: поиск пользователя по эл. адресу
+    Description: вывод всех пользователей с возможностью поиска конкретного пользователя по email
 
     Return value: array
 **/
-function get_user_by_email($email) {
-    $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin","root", "root");
-    $sql = "SELECT * FROM two_person WHERE email=:email";
-    $statement = $pdo->prepare($sql);
-    $statement->execute(["email" => $email]);
-    $user = $statement->fetch(PDO::FETCH_ASSOC);
+function get_user_by_email($email = "")
+{
+    $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
+    if (empty($email)) {
+            $sql = "SELECT * FROM two_person";
+            $statement = $pdo->prepare($sql);
+            $statement->execute();
+            $user = $statement->fetchAll(PDO::FETCH_ASSOC);
+    }else{
+            $sql = "SELECT * FROM two_person WHERE email=:email";
+            $statement = $pdo->prepare($sql);
+            $statement->execute(["email" => $email]);
+            $user = $statement->fetch(PDO::FETCH_ASSOC);
+    }
 
     return $user;
 };
@@ -40,6 +48,7 @@ function login($email, $password) {
         $_SESSION['id'] = $user['id'];
         $_SESSION['email'] = $user['email'];
         $_SESSION['password'] = $user['password'];
+        $_SESSION['role'] = $user['role'];
         redirect_to("/users.php");
     }
 }
@@ -75,7 +84,7 @@ function add_user($email, $password) {
 **/
 function set_flash_message($name, $message) {
     $_SESSION[$name] = $message;
-    $_SESSION['text_name'] = $name;
+    $_SESSION['status_message'] = $name;
 };
 
 /**
@@ -90,7 +99,7 @@ function display_flash_message($name) {
     if (!empty($_SESSION[$name])) {
         echo "<div class=\"alert alert-{$name} text-dark\" role=\"alert\">{$_SESSION[$name]}</div>";
         unset($_SESSION[$name]);
-        unset($_SESSION['text_name']);
+        unset($_SESSION['status_message']);
     }
 };
 
@@ -107,4 +116,40 @@ function redirect_to($path) {
     exit();
 }
 
+/**
+Parameters:
+
+Description: проверка на неавторизованность пользователя
+
+Return value: boolean
+**/
+function is_not_logged_in () {
+
+    if(isset($_SESSION['email']) && !empty($_SESSION['email'])) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+Parameters:
+
+Description: проверка на роль администратора
+
+Return value: boolean
+ **/
+function check_admin () {
+    if($_SESSION['role'] == "admin") {
+        return true;
+    }
+    return false;
+}
+
+function vardump($value) {
+    echo '<pre>';
+    var_dump($value);
+    echo '</pre>';
+    die();
+}
 ?>
