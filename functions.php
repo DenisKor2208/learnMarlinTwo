@@ -1,60 +1,56 @@
 <?php
 /**
     Parameters:
+        string - $table
         string - $email
 
     Description: вывод всех пользователей с возможностью поиска конкретного пользователя по email
 
     Return value: array
 **/
-function get_user_by_email($email = "")
+function get_user_by_email($table, $email = "")
 {
     $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
     if (empty($email)) {
-            $sql = "SELECT * FROM two_person";
+            $sql = "SELECT * FROM $table";
             $statement = $pdo->prepare($sql);
             $statement->execute();
             $user = $statement->fetchAll(PDO::FETCH_ASSOC);
     }else{
-            $sql = "SELECT * FROM two_person WHERE email=:email";
+            $sql = "SELECT * FROM $table WHERE email=:email";
             $statement = $pdo->prepare($sql);
             $statement->execute(["email" => $email]);
             $user = $statement->fetch(PDO::FETCH_ASSOC);
     }
-
     return $user;
 };
 
 /**
 Parameters:
-string - $email
-string - $password
+    string - $table
+    string - $email
+    string - $password
 
 Description: авторизовать пользователя
 
 Return value: boolean
  **/
-function login($email, $password) {
+function login($table, $email, $password) {
 
-    $user = get_user_by_email($email);
+    $user = get_user_by_email($table, $email);
 
-    if (empty($user)) {
-        set_flash_message("danger", "Пользователь не найден!");
-        redirect_to("/page_login.php");
-    }elseif (!password_verify($password, $user['password'])) {
-        set_flash_message("danger", "Ошибка при вводе пароля");
-        redirect_to("/page_login.php");
+    if(empty($user)) {
+        return "email not found";
+    }elseif(!password_verify($password, $user['password'])) {
+        return "password not found";
     }else {
-        $_SESSION['id'] = $user['id'];
-        $_SESSION['email'] = $user['email'];
-        $_SESSION['password'] = $user['password'];
-        $_SESSION['role'] = $user['role'];
-        redirect_to("/users.php");
+        return $user;
     }
 }
 
 /**
-    Parameters:
+ * Parameters:
+        string - $table
         string - $email
         stirng - $password
 
@@ -62,9 +58,9 @@ function login($email, $password) {
 
     Return value: int (user_id)
 **/
-function add_user($email, $password) {
+function add_user($table, $email, $password) {
     $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
-    $sql = "INSERT INTO two_person (email, password) VALUES (:email, :password)";
+    $sql = "INSERT INTO $table (email, password) VALUES (:email, :password)";
     $statement = $pdo->prepare($sql);
     $result = $statement->execute(["email" => $email,
                                    "password" => password_hash($password, PASSWORD_DEFAULT)
@@ -72,6 +68,85 @@ function add_user($email, $password) {
 
     return $pdo->lastInsertId();
 };
+
+/**
+    Parameters:
+        string - $table
+        array - $data
+        $integer - $user_id
+
+    Description: редактировать профиль
+
+    Return value: boolean
+**/
+function edit($table, $data, $user_id) {
+    $fields = '';
+
+    foreach($data as $key => $value) {
+        if($key == "first_name" || $key == "last_name" || $key == "company" || $key == "phone_number" || $key == "address" || $key == "role"){
+            $fields .= $key . "=:" . $key . ",";
+        }else {
+            unset($data[$key]);
+        }
+        }
+
+    $data += ['id'=>$user_id];
+    $fields = rtrim($fields, ',');
+
+    $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
+    $sql = "UPDATE $table SET $fields WHERE id=:id";
+    $statement = $pdo->prepare($sql);
+    $statement->execute($data);
+}
+
+/**
+Parameters:
+    string - $table
+    string - $status
+    $integer - $user_id
+
+Description: установить статус
+
+Return value: null
+ **/
+function set_status($table, $status, $user_id) {
+    $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
+    $sql = "UPDATE $table SET online_status=:online_status WHERE id=:id";
+    $statement = $pdo->prepare($sql);
+    $statement->execute(["online_status" => $status,
+                         "id" => $user_id
+                        ]);
+}
+
+/**
+Parameters:
+    string - $table
+    array - $data
+    $integer - $user_id
+
+Description: добавить ссылки на соц. сети
+
+Return value: null
+ **/
+function add_social_links($table, $data, $user_id) {
+    $fields = '';
+
+    foreach($data as $key => $value) {
+        if($key == "vk" || $key == "telegram" || $key == "instagram"){
+            $fields .= $key . "=:" . $key . ",";
+        }else {
+            unset($data[$key]);
+        }
+    }
+
+    $data += ['id'=>$user_id];
+    $fields = rtrim($fields, ',');
+
+    $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
+    $sql = "UPDATE $table SET $fields WHERE id=:id";
+    $statement = $pdo->prepare($sql);
+    $statement->execute($data);
+}
 
 /**
     Parameters:
@@ -140,10 +215,39 @@ Description: проверка на роль администратора
 Return value: boolean
  **/
 function check_admin () {
-    if($_SESSION['role'] == "admin") {
+    if($_SESSION['role'] == "Администратор") {
         return true;
     }
     return false;
+}
+
+/**
+Parameters:
+    $image array
+
+Description: загрузить аватар
+
+Return value: null | string (path)
+**/
+function upload_avatar ($image, $table, $user_id) {
+
+    /* удаление файла аватара из папки
+    $img_for_delete = get_user_by_email($table, "chtil@list.ru");
+    unlink("img/avatar/" . $img_for_delete['img_avatar']);
+    */
+
+    $extension = pathinfo($image['name'], PATHINFO_EXTENSION);
+    $filename = uniqid() . "." . $extension;
+
+    move_uploaded_file($image['tmp_name'], "img/avatar/" . $filename);
+
+
+    $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
+    $sql = "UPDATE $table SET img_avatar=:img_avatar WHERE id=:id";
+    $statement = $pdo->prepare($sql);
+    $statement->execute(["img_avatar" => $filename,
+                                "id" => $user_id
+                               ]);
 }
 
 function vardump($value) {
