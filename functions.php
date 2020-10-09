@@ -4,24 +4,30 @@
         string - $table
         string - $email
 
-    Description: вывод всех пользователей с возможностью поиска конкретного пользователя по email
+    Description: вывод всех пользователей с возможностью поиска конкретного пользователя по email или id
 
     Return value: array
 **/
-function get_user_by_email($table, $email = "")
+function get_user_by_email_or_id($table, $email = "", $user_id = "")
 {
     $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
-    if (empty($email)) {
-            $sql = "SELECT * FROM $table";
-            $statement = $pdo->prepare($sql);
-            $statement->execute();
-            $user = $statement->fetchAll(PDO::FETCH_ASSOC);
-    }else{
+    if (!empty($email)) {
             $sql = "SELECT * FROM $table WHERE email=:email";
             $statement = $pdo->prepare($sql);
             $statement->execute(["email" => $email]);
             $user = $statement->fetch(PDO::FETCH_ASSOC);
+    }elseif (!empty($user_id)) {
+            $sql = "SELECT * FROM $table WHERE id=:id";
+            $statement = $pdo->prepare($sql);
+            $statement->execute(["id" => $user_id]);
+            $user = $statement->fetch(PDO::FETCH_ASSOC);
+    }else {
+            $sql = "SELECT * FROM $table";
+            $statement = $pdo->prepare($sql);
+            $statement->execute();
+            $user = $statement->fetchAll(PDO::FETCH_ASSOC);
     }
+
     return $user;
 };
 
@@ -37,7 +43,7 @@ Return value: boolean
  **/
 function login($table, $email, $password) {
 
-    $user = get_user_by_email($table, $email);
+    $user = get_user_by_email_or_id($table, $email);
 
     if(empty($user)) {
         return "email not found";
@@ -248,6 +254,22 @@ function upload_avatar ($image, $table, $user_id) {
     $statement->execute(["img_avatar" => $filename,
                                 "id" => $user_id
                                ]);
+}
+
+/**
+Parameters:
+    $logger_user_id int
+    $edit_user_id int
+
+Description: проверить, автор ли текущий авторизованный пользователь
+
+Return value: boolean
+ **/
+function is_author ($logger_user_id, $edit_user_id) {
+    if ($logger_user_id == $edit_user_id) {
+        return true;
+    }
+    return false;
 }
 
 function vardump($value) {

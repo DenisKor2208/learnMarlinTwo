@@ -5,7 +5,7 @@ require "functions.php";
 $email = $_POST['user_email'];
 $password = $_POST['user_password'];
 
-$user = get_user_by_email("two_person", $email);
+$user = get_user_by_email_or_id("two_person", $email);
 
 if (!empty($user)) {
     set_flash_message("danger", "Этот эл. адрес уже занят другим пользователем");

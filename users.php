@@ -73,7 +73,7 @@ if (is_not_logged_in()) {
                 </div>
             </div>
             <div class="row" id="js-contacts">
-                <?php $people = get_user_by_email("two_person");
+                <?php $people = get_user_by_email_or_id("two_person");
                       foreach ($people as $value): ?>
 
                 <div class="col-xl-4">
