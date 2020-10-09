@@ -79,7 +79,7 @@ $user = get_user_by_email_or_id("two_person", null, $current_user_id);
 
                                 <!-- last_username -->
                                 <div class="form-group">
-                                    <label class="form-label" for="simpleinput">Имя</label>
+                                    <label class="form-label" for="simpleinput">Фамилия</label>
                                     <input type="text" id="simpleinput" class="form-control" name="last_name" value="<?php echo $user['last_name']; ?>">
                                 </div>
 
