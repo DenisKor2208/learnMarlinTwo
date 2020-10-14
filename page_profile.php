@@ -81,9 +81,9 @@ $user = get_user_by_email_or_id("two_person", null, $current_user_id);
                             <div class="col-12">
                                 <div class="p-3 text-center">
                                     <a href="<?php echo $user['phone_number']; ?>" class="mt-1 d-block fs-sm fw-400 text-dark">
-                                        <i class="fas fa-mobile-alt text-muted mr-2"></i> +1 317-456-2564</a>
+                                        <i class="fas fa-mobile-alt text-muted mr-2"></i> <?php echo $user['phone_number']; ?></a>
                                     <a href="mailto:<?php echo $user['email']; ?>" class="mt-1 d-block fs-sm fw-400 text-dark">
-                                        <i class="fas fa-mouse-pointer text-muted mr-2"></i> oliver.kopyov@marlin.ru</a>
+                                        <i class="fas fa-mouse-pointer text-muted mr-2"></i><?php echo $user['email']; ?></a>
                                     <address class="fs-sm fw-400 mt-4 text-muted">
                                         <i class="fas fa-map-pin mr-2"></i> <?php echo $user['address']; ?>
                                     </address>
