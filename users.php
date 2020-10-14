@@ -81,7 +81,7 @@ if (is_not_logged_in()) {
                         <div class="card-body border-faded border-top-0 border-left-0 border-right-0 rounded-top">
                             <div class="d-flex flex-row align-items-center">
                                 <span class="status status-success mr-3">
-                                    <span class="rounded-circle profile-image d-block " style="background-image:url('img/avatar/<?php echo $value['img_avatar']?>'); background-size: cover;"></span>
+                                    <a href="page_profile.php?id=<?php echo $value['id']; ?>"><span class="rounded-circle profile-image d-block " style="background-image:url('img/avatar/<?php echo $value['img_avatar']; ?>'); background-size: cover;"></span></a>
                                 </span>
                                 <div class="info-card-text flex-1">
 
