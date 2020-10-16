@@ -1,3 +1,20 @@
+<?php
+session_start();
+require "functions.php";
+$open_user_id = $_GET['id'];
+
+
+if (is_not_logged_in()) {
+    redirect_to("/page_login.php");
+}
+
+if (!check_admin() and !is_author($_SESSION['id'], $open_user_id)) {
+    set_flash_message("danger", "Можно редактировать только свой профиль");
+    redirect_to("/users.php");
+}
+
+$user = get_user_by_email_or_id("two_person", null, $open_user_id);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,23 +39,29 @@
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="page_login.php">Войти</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Выйти</a>
-                </li>
+                <?php if (is_not_logged_in()) :?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="page_login.php">Войти</a>
+                    </li>
+                <?php else: ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="exit.php">Выйти</a>
+                    </li>
+                <?php endif; ?>
             </ul>
         </div>
     </nav>
     <main id="js-page-content" role="main" class="page-content mt-3">
+
+        <?php display_flash_message($_SESSION['status_message']);?>
+
         <div class="subheader">
             <h1 class="subheader-title">
                 <i class='subheader-icon fal fa-lock'></i> Безопасность
             </h1>
 
         </div>
-        <form action="">
+        <form action="change_security.php?id=<?php echo $user['id']; ?>" method="POST">
             <div class="row">
                 <div class="col-xl-6">
                     <div id="panel-1" class="panel">
@@ -50,19 +73,19 @@
                                 <!-- email -->
                                 <div class="form-group">
                                     <label class="form-label" for="simpleinput">Email</label>
-                                    <input type="text" id="simpleinput" class="form-control" value="john@example.com">
+                                    <input type="text" id="simpleinput" class="form-control" name="user_email" value="<?php echo $user['email']; ?>">
                                 </div>
 
                                 <!-- password -->
                                 <div class="form-group">
                                     <label class="form-label" for="simpleinput">Пароль</label>
-                                    <input type="password" id="simpleinput" class="form-control">
+                                    <input type="password" id="simpleinput" class="form-control" name="user_password">
                                 </div>
 
                                 <!-- password confirmation-->
                                 <div class="form-group">
                                     <label class="form-label" for="simpleinput">Подтверждение пароля</label>
-                                    <input type="password" id="simpleinput" class="form-control">
+                                    <input type="password" id="simpleinput" class="form-control" name="user_password_repeat">
                                 </div>
 
 

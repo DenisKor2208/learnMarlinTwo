@@ -272,6 +272,41 @@ function is_author ($logger_user_id, $edit_user_id) {
     return false;
 }
 
+/**
+Parameters:
+    $user_id int
+    $email string
+    $password string
+
+Description: редактировать входные данные: email и password
+
+Return value: null | boolean
+ **/
+function edit_credentials($table, $user_id, $email = null, $password = null) {
+    $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
+
+    if($email == null) {
+        $sql = "UPDATE $table SET password=:password WHERE id=:id";
+        $statement = $pdo->prepare($sql);
+        $statement->execute(["id" => $user_id,
+                             "password" => password_hash($password, PASSWORD_DEFAULT)
+        ]);
+    }elseif($password == null) {
+        $sql = "UPDATE $table SET email=:email WHERE id=:id";
+        $statement = $pdo->prepare($sql);
+        $statement->execute(["id" => $user_id,
+                             "email" => $email
+        ]);
+    }else{
+        $sql = "UPDATE $table SET email=:email, password=:password  WHERE id=:id";
+        $statement = $pdo->prepare($sql);
+        $statement->execute(["id" => $user_id,
+                             "email" => $email,
+                             "password" => password_hash($password, PASSWORD_DEFAULT)
+        ]);
+    }
+}
+
 function vardump($value) {
     echo '<pre>';
     var_dump($value);
