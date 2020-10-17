@@ -118,9 +118,9 @@ if (is_not_logged_in()) {
                                 <div class="form-group">
                                     <label class="form-label" for="example-select">Выберите статус</label>
                                     <select class="form-control" id="example-select" name="online_status">
-                                        <option>Онлайн</option>
-                                        <option>Отошел</option>
-                                        <option>Не беспокоить</option>
+                                        <option value="online">Онлайн</option>
+                                        <option value="away">Отошел</option>
+                                        <option value="busy">Не беспокоить</option>
                                     </select>
                                 </div>
 

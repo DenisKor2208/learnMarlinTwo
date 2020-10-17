@@ -80,7 +80,13 @@ if (is_not_logged_in()) {
                     <div id="c_1" class="card border shadow-0 mb-g shadow-sm-hover" data-filter-tags="oliver kopyov">
                         <div class="card-body border-faded border-top-0 border-left-0 border-right-0 rounded-top">
                             <div class="d-flex flex-row align-items-center">
-                                <span class="status status-success mr-3">
+                                <?php if ($value['online_status'] == "online") :?>
+                                    <span class="status status-success mr-3">
+                                <?php elseif ($value['online_status'] == "away") :?>
+                                    <span class="status status-warning mr-3">
+                                <?php elseif ($value['online_status'] == "busy") :?>
+                                    <span class="status status-danger mr-3">
+                                <?php endif; ?>
                                     <a href="page_profile.php?id=<?php echo $value['id']; ?>"><span class="rounded-circle profile-image d-block " style="background-image:url('img/avatar/<?php echo $value['img_avatar']; ?>'); background-size: cover;"></span></a>
                                 </span>
                                 <div class="info-card-text flex-1">
