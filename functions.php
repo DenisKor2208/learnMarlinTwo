@@ -247,7 +247,6 @@ function upload_avatar ($image, $table, $user_id) {
 
     move_uploaded_file($image['tmp_name'], "img/avatar/" . $filename);
 
-
     $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
     $sql = "UPDATE $table SET img_avatar=:img_avatar WHERE id=:id";
     $statement = $pdo->prepare($sql);
@@ -305,6 +304,23 @@ function edit_credentials($table, $user_id, $email = null, $password = null) {
                              "password" => password_hash($password, PASSWORD_DEFAULT)
         ]);
     }
+}
+
+/**
+Parameters:
+    $user_id int
+
+Description: проверяет есть ли аватар у пользователя
+
+Return value: null | boolean
+ **/
+function has_image($user_id, $table) {
+    $user_img = get_user_by_email_or_id($table, null, $user_id);
+
+    if(empty($user_img['img_avatar'])) {
+        return false;
+    }
+    return true;
 }
 
 function vardump($value) {
