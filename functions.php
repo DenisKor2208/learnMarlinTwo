@@ -237,11 +237,6 @@ Return value: null | string (path)
 **/
 function upload_avatar ($image, $table, $user_id) {
 
-    /* удаление файла аватара из папки
-    $img_for_delete = get_user_by_email($table, "chtil@list.ru");
-    unlink("img/avatar/" . $img_for_delete['img_avatar']);
-    */
-
     $extension = pathinfo($image['name'], PATHINFO_EXTENSION);
     $filename = uniqid() . "." . $extension;
 
@@ -252,7 +247,7 @@ function upload_avatar ($image, $table, $user_id) {
     $statement = $pdo->prepare($sql);
     $statement->execute(["img_avatar" => $filename,
                                 "id" => $user_id
-                               ]);
+                       ]);
 }
 
 /**
@@ -321,6 +316,29 @@ function has_image($user_id, $table) {
         return false;
     }
     return true;
+}
+
+/**
+Parameters:
+    $image array
+    $user_id int
+
+Description: удалить аватар
+
+Return value: null | string (path)
+ **/
+function delete_avatar ($table, $user_id) {
+
+ $img_for_delete = get_user_by_email_or_id($table, null, $user_id);
+ unlink("img/avatar/" . $img_for_delete['img_avatar']);
+
+    $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
+    $sql = "UPDATE $table SET img_avatar=:img_avatar WHERE id=:id";
+    $statement = $pdo->prepare($sql);
+    $statement->execute(["img_avatar" => NULL,
+        "id" => $user_id
+    ]);
+
 }
 
 function vardump($value) {
