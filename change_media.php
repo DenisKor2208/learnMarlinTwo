@@ -15,6 +15,6 @@ if (empty($_FILES['image']['name'])) {
 }
 
 set_flash_message("success", "Профиль успешно обновлен");
-redirect_to("/page_profile.php?id=".$open_user_id);
+redirect_to("/media.php?id=".$open_user_id);
 
 ?>
