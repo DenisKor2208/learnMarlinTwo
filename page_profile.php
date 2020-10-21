@@ -48,6 +48,9 @@ $user = get_user_by_email_or_id("two_person", null, $current_user_id);
             </div>
         </nav>
         <main id="js-page-content" role="main" class="page-content mt-3">
+
+            <?php display_flash_message($_SESSION['status_message']);?>
+
             <div class="subheader">
                 <h1 class="subheader-title">
                     <i class='subheader-icon fal fa-user'></i> <?php echo $user['first_name'] ." ".$user['last_name']; ?>
