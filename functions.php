@@ -351,6 +351,11 @@ Return value: null | boolean
  **/
 function delete($table, $user_id) {
 
+    $img_for_delete = get_user_by_email_or_id($table, null, $user_id);
+    if (!empty($img_for_delete['img_avatar'])){
+        unlink("img/avatar/" . $img_for_delete['img_avatar']);
+    }
+
     $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
     $sql = "DELETE FROM $table WHERE id=:id";
     $statement = $pdo->prepare($sql);
