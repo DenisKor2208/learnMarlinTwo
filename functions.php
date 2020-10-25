@@ -341,6 +341,24 @@ function delete_avatar ($table, $user_id) {
 
 }
 
+/**
+Parameters:
+    $user_id int
+
+Description: удалить пользователя
+
+Return value: null | boolean
+ **/
+function delete($table, $user_id) {
+
+    $pdo = new PDO("mysql:host=localhost;dbname=edu_marlin", "root", "root");
+    $sql = "DELETE FROM $table WHERE id=:id";
+    $statement = $pdo->prepare($sql);
+    $statement->bindParam(":id", $user_id);
+    $statement->execute();
+
+}
+
 function vardump($value) {
     echo '<pre>';
     var_dump($value);
